@@ -9,10 +9,25 @@ color orange= #F0A000;
 color cyan = color(153, 217, 234);
 color brown = color(185, 122, 87);
 color pink = color(255, 174, 201);
+color grey = color (127, 127, 127);
+color reds = color (136, 0, 21);
+color yellowC = color(239, 228, 176);
+color yellowL = color(255, 201, 14);
+color yellowR = color(255, 242, 0);
+color greenT = color(181, 230, 29);
+color greenTL = color(34, 177, 76);
+color blueTR = color(153, 217, 235);
+color blueBR = color(112, 146, 190);
+color blueBL = color(63, 72, 204);
+color violetB = color(163, 73, 164);
+color sixtyfour = color(64, 0, 64);
+color browny = color(128, 64, 0);
 
 PImage map, ice, stone, treeTrunk, spring, treetopm, treetopl, treetopr, bridgec, bridgeintersection;
-PImage spike;
+PImage spike, cloud, wall;
 PImage background;
+PImage gc, gr, gt, gtr, gtl, gb, gbr, gbl, gl;
+boolean staticc;
 
 PImage[] idle;
 PImage[] jump;
@@ -32,6 +47,8 @@ FPlayer player;
 void setup() {
   size(700, 393, P2D);
   Fisica.init(this);
+  terrain = new ArrayList<FGameObject> ();
+  enemies = new ArrayList<FGameObject> ();
   loadImages();
 
   loadWorld(map);
@@ -47,10 +64,23 @@ void loadImages() {
   stone = loadImage("brick.png");
   treetopm = loadImage("treetop_center.png");
   treetopl = loadImage("treetop_w.png");
+  cloud = loadImage("spikess.png");
   treetopr = loadImage("treetop_e.png");
   bridgec = loadImage("bridge_center.png");
-  spike = loadImage("spikes.png");
+  spike = loadImage("spike.png");
   bridgeintersection = loadImage("tree_intersect.png");
+  spring = loadImage("trampoline.png");
+  wall = loadImage("wall.png");
+
+  gc = loadImage("dirt_center.png");
+  gr = loadImage("dirt_e.png");
+  gt = loadImage("dirt_n.png");
+  gtr = loadImage("dirt_ne.png");
+  gtl = loadImage("dirt_nw.png");
+  gb = loadImage("dirt_s.png");
+  gbr = loadImage("dirt_se.png");
+  gbl = loadImage("dirt_sw.png");
+  gl = loadImage("dirt_w.png");
 
   idle = new PImage[2];
   idle[0] = loadImage("idle0.png");
@@ -93,52 +123,103 @@ void loadWorld(PImage img) {
         b.setFriction(6);
         b.setName("stonebricks");
         world.add(b);
-      }
-      if (c == cyan) {
+      } else if (c == cyan) {
         b.attachImage(ice);
         b.setFriction(0);
         b.setName("ice");
         world.add(b);
-      }
-      if (c == brown) {
+      } else if (c == brown) {
         b.attachImage(treeTrunk);
         b.setSensor(true);
         b.setName("tree trunk");
         world.add(b);
-      }
-      if (c == #00FF00) {//green//
+      } else if (c == #00FF00) {//green//
         b.attachImage(treetopm);
         b.setName("treetopw");
         b.setFriction(4);
         world.add(b);
-      }
-      if (c == #095D02) {
+      } else if (c == #095D02) {
         b.attachImage(treetopl);
         b.setFriction(4);
         b.setName("treetopL");
         world.add(b);
-      }
-      if (c == #2FA025) {
+      } else if (c == #2FA025) {
         b.attachImage(treetopr);
         b.setFriction(4);
         b.setName("treetopr");
         world.add(b);
-      }
-      if (c == #5D2400) {
-        b.attachImage(bridgec);
-        b.setFriction(6);
-        b.setName("bridgew");
-        world.add(b);
-      }
-      if (c == #A2A2A2) {
+      } else if (c == #5D2400) {
+        FBridge br = new FBridge(x*gridSize, y*gridSize);
+        terrain.add(br);
+        br.attachImage(bridgec);
+        world.add(br);
+      } else if (c == #A2A2A2) {
         b.attachImage(spike);
         b.setName("spikes");
         world.add(b);
-      }
-      if (c == pink) {
+      } else if (c == pink) {
         b.attachImage(bridgeintersection);
         b.setName("intersec");
         world.add(b);
+      } else if (c == reds) {
+        b.attachImage(spring);
+        b.setName("springss");
+        b.setRestitution(2);
+        world.add(b);
+      } else if (c == yellowC) {
+        b.attachImage(gc);
+        b.setName("Centerc");
+        b.setFriction(6);
+        world.add(b);
+      } else if (c == yellowL) {
+        b.attachImage(gl);
+        b.setName("leftg");
+        b.setFriction(6);
+        world.add(b);
+      } else if (c == yellowR) {
+        b.attachImage(gr);
+        b.setName("rightg");
+        b.setFriction(6);
+        world.add(b);
+      } else if (c == greenT) {
+        b.attachImage(gt);
+        b.setName("topg");
+        b.setFriction(6);
+        world.add(b);
+      } else if (c == greenTL) {
+        b.attachImage(gtl);
+        b.setName("grasstl");
+        b.setFriction(6);
+        world.add(b);
+      } else if (c == blueTR) {
+        b.attachImage(gtr);
+        b.setName("grasstr");
+        b.setFriction(6);
+        world.add(b);
+      } else if (c == blueBR) {
+        b.attachImage(gbr);
+        b.setName("grassbr");
+        b.setFriction(6);
+        world.add(b);
+      } else if (c == blueBL) {
+        b.attachImage(gbl);
+        b.setName("grassbl");
+        b.setFriction(6);
+        world.add(b);
+      } else if (c == violetB) {
+        b.attachImage(gb);
+        b.setName("grassb");
+        b.setFriction(6);
+        world.add(b);
+      } else if (c== sixtyfour) {
+        b.attachImage(wall);
+        b.setName("wall");
+        world.add(b);
+        b.setFriction(3);
+      } else if (c == browny) {
+        FGoomba gmb = new FGoomba(x*gridSize, y*gridSize);
+        enemies.add(gmb);
+        world.add(gmb);
       }
     }
   }
@@ -152,6 +233,7 @@ void loadPlayer() {
 void draw() {
   background(background);
   drawWorld();
+  actWorld();
   player.act();
 }
 
@@ -160,6 +242,10 @@ void actWorld() {
   for (int i = 0; i < terrain.size(); i++) {
     FGameObject t = terrain.get(i);
     t.act();
+  }
+  for (int i = 0; i<enemies.size(); i++){
+   FGameObject e = enemies.get(i);
+   e.act();
   }
 }
 

@@ -8,9 +8,10 @@ class FPlayer extends FGameObject {
     super();
     frame = 0;
     lives = 3;
-    setPosition(0, 0);
+    setPosition(150, 0);
     setName("player");
     setRotatable(false);
+    attachImage(idle[0]);
   }
   void act() {
     input();
@@ -54,7 +55,8 @@ class FPlayer extends FGameObject {
 
   void collisions() {
     if (isTouching("spikes")) {
-      setPosition (0, 0);
+      delay(200);
+      setPosition (150, 0);
     }
   }
 }
