@@ -25,3 +25,17 @@ void keyReleased() {
   if (keyCode == LEFT)  leftkey  = false;
   if (keyCode == RIGHT) rightkey = false;
 }
+
+void mouseReleased() {
+  if (mode == INTRO) {
+    introClicks();
+  } else if (mode == GAME) {
+    gameClicks();
+  } else if (mode == PAUSE) {
+    pauseClicks();
+  } else if (mode == GAMEWIN) {
+    gamewinClicks();
+  } else if (mode == GAMEOVER) {
+    gameoverClicks();
+  }
+}
