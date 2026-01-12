@@ -4,6 +4,8 @@ void game() {
   actWorld();
   player.act();
   pausebutton();
+  
+  drawLives(player.lives);
 }
 
 void gameClicks() {
@@ -13,8 +15,9 @@ void gameClicks() {
 }
 
 void pausebutton() {
+  
   fill(255);
-  noStroke();
+  stroke(0);
   rect(17, 20, 3, 10, 5);
   rect(23, 20, 3, 10, 5);
 }

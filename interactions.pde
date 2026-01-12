@@ -10,6 +10,11 @@ void keyPressed() {
   if (keyCode == UP)    upkey    = true;
   if (keyCode == LEFT)  leftkey  = true;
   if (keyCode == RIGHT) rightkey = true;
+
+  if (keyCode == ESC) {
+    key = 0;
+    mode = 2;
+  }
 }
 
 void keyReleased() {
@@ -37,5 +42,37 @@ void mouseReleased() {
     gamewinClicks();
   } else if (mode == GAMEOVER) {
     gameoverClicks();
+  }
+}
+
+void drawLives(int lives) {
+  if (lives == 3) {
+    fill(intro);
+    textSize(32);
+    text("000", width - 60, height - 25);
+
+    fill(#e31b23);
+    textSize(30);
+    text("000", width - 60, height - 25);
+  }
+
+  if (lives == 2) {
+    fill(intro);
+    textSize(32);
+    text("00", width - 67, height - 25);
+
+    fill(#e31b23);
+    textSize(30);
+    text("00", width - 67, height - 25);
+  }
+
+  if (lives == 1) {
+    fill(intro);
+    textSize(32);
+    text("0", width - 74, height - 25);
+
+    fill(#e31b23);
+    textSize(30);
+    text("0", width - 74, height - 25);
   }
 }

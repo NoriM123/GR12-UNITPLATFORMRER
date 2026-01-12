@@ -16,3 +16,7 @@ class FBridge extends FGameObject {
    }
   }
 }
+
+void teleportationdevice() {
+  
+}

@@ -24,14 +24,17 @@ color sixtyfour = color(64, 0, 64);
 color browny = color(128, 64, 0);
 color intro = #C69898;
 color backintro = #C84C0C;
+color dirtyellow = #9B9A7E;
 
 PFont myFont;
 
 PImage map, ice, stone, treeTrunk, spring, treetopm, treetopl, treetopr, bridgec, bridgeintersection;
-PImage spike, cloud, wall;
+PImage spike, cloud, wall, teleport;
 PImage background;
 PImage gc, gr, gt, gtr, gtl, gb, gbr, gbl, gl;
 boolean staticc;
+
+int lives;
 
 int mode;
 final int INTRO = 0;
@@ -39,7 +42,6 @@ final int GAME = 1;
 final int PAUSE = 2;
 final int GAMEWIN = 3;
 final int GAMEOVER = 4;
-
 
 PImage[] idle;
 PImage[] jump;
@@ -53,12 +55,12 @@ ArrayList<FGameObject> enemies;
 
 int gridSize = 32;
 float zoom = 1.5;
-boolean upkey, downkey, leftkey, rightkey, wkey, akey, skey, spacekey, dkey;
+boolean upkey, downkey, leftkey, rightkey, wkey, akey, skey, spacekey, dkey, escape;
 
 FPlayer player;
 
 void setup() {
-  size(700, 393, P2D);
+  size(1399, 900, P2D);
   mode = 0;
   Fisica.init(this);
   terrain = new ArrayList<FGameObject> ();
@@ -71,7 +73,7 @@ void setup() {
 }
 
 void loadImages() {
-  background = loadImage("super.jpg");
+  background = loadImage("super3.png");
   map = loadImage("Untitled.png");
   ice = loadImage("blueBlock.png");
   treeTrunk = loadImage("tree_trunk.png");
@@ -96,6 +98,8 @@ void loadImages() {
   gbr = loadImage("dirt_se.png");
   gbl = loadImage("dirt_sw.png");
   gl = loadImage("dirt_w.png");
+  
+  teleport = loadImage("gold.png");
 
   idle = new PImage[2];
   idle[0] = loadImage("idle0.png");
@@ -146,7 +150,7 @@ void loadWorld(PImage img) {
       } else if (c == brown) {
         b.attachImage(treeTrunk);
         b.setSensor(true);
-        b.setName("tree trunk");
+        b.setName("treetrunk");
         world.add(b);
       } else if (c == #00FF00) {//green//
         b.attachImage(treetopm);
@@ -167,6 +171,7 @@ void loadWorld(PImage img) {
         FBridge br = new FBridge(x*gridSize, y*gridSize);
         terrain.add(br);
         br.attachImage(bridgec);
+        br.setName("bridge");
         world.add(br);
       } else if (c == #A2A2A2) {
         b.attachImage(spike);
@@ -235,6 +240,11 @@ void loadWorld(PImage img) {
         FGoomba gmb = new FGoomba(x*gridSize, y*gridSize);
         enemies.add(gmb);
         world.add(gmb);
+      } else if (c== dirtyellow) {
+        b.attachImage(teleport);
+        b.setName("teledevice");
+        b.setFriction(6);
+        world.add(b);
       }
     }
   }
