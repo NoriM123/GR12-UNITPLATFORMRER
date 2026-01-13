@@ -1,5 +1,5 @@
 void gameover() {
-  background(background);
+ // background(background);
 
   fill(intro);
   noStroke();

@@ -1,5 +1,5 @@
 void gamewin() {
-  background(background);
+ // background(background);
 
   fill(intro);
   noStroke();

@@ -1,5 +1,9 @@
 import fisica.*;
+import gifAnimation.*;
 FWorld world;
+
+FPortal portalIn;
+FPortalO portalOut;
 
 color black = #000000;
 color green = #00FF00;
@@ -28,8 +32,10 @@ color dirtyellow = #9B9A7E;
 
 PFont myFont;
 
+int numberOfFrames, nnumberofframes;
+
 PImage map, ice, stone, treeTrunk, spring, treetopm, treetopl, treetopr, bridgec, bridgeintersection;
-PImage spike, cloud, wall, teleport;
+PImage spike, cloud, wall, teleport, teleports;
 PImage background;
 PImage gc, gr, gt, gtr, gtl, gb, gbr, gbl, gl;
 boolean staticc;
@@ -49,10 +55,12 @@ PImage[] run;
 PImage[] action;
 PImage[] goomba;
 PImage[] gif;
+Gif myGif, mmyGif;
 
 ArrayList<FGameObject> terrain;
 ArrayList<FGameObject> enemies;
 
+int f, v, r;
 int gridSize = 32;
 float zoom = 1.5;
 boolean upkey, downkey, leftkey, rightkey, wkey, akey, skey, spacekey, dkey, escape;
@@ -60,7 +68,7 @@ boolean upkey, downkey, leftkey, rightkey, wkey, akey, skey, spacekey, dkey, esc
 FPlayer player;
 
 void setup() {
-  size(1399, 900, P2D);
+  size(1300, 800, P2D);
   mode = 0;
   Fisica.init(this);
   terrain = new ArrayList<FGameObject> ();
@@ -70,11 +78,15 @@ void setup() {
   textFont(myFont);
   loadWorld(map);
   loadPlayer();
+  myGif = new Gif(this, "1gif.gif");
+  myGif.loop();
+  mmyGif = new Gif(this, "2gif.gif");
+  mmyGif.loop();
 }
 
 void loadImages() {
-  background = loadImage("super3.png");
-  map = loadImage("Untitled.png");
+  background = loadImage("superfinal.png");
+  map = loadImage("Untitled (1).png");
   ice = loadImage("blueBlock.png");
   treeTrunk = loadImage("tree_trunk.png");
   ice.resize(32, 32);
@@ -98,8 +110,9 @@ void loadImages() {
   gbr = loadImage("dirt_se.png");
   gbl = loadImage("dirt_sw.png");
   gl = loadImage("dirt_w.png");
-  
+
   teleport = loadImage("gold.png");
+  teleports = loadImage("gold copy.png");
 
   idle = new PImage[2];
   idle[0] = loadImage("idle0.png");
@@ -241,10 +254,19 @@ void loadWorld(PImage img) {
         enemies.add(gmb);
         world.add(gmb);
       } else if (c== dirtyellow) {
-        b.attachImage(teleport);
-        b.setName("teledevice");
-        b.setFriction(6);
-        world.add(b);
+        portalIn = new FPortal(x*gridSize, y*gridSize);
+        terrain.add(portalIn);
+        portalIn.attachImage(teleport);
+        portalIn.setFriction(6);
+        portalIn.setName("FPortals");
+        world.add(portalIn);
+      } else if (c== red) {
+        portalOut = new FPortalO(x*gridSize, y*gridSize);
+        terrain.add(portalOut);
+        portalOut.attachImage(teleports);
+        portalOut.setFriction(6);
+        portalOut.setName("FPortalO");
+        world.add(portalOut);
       }
     }
   }

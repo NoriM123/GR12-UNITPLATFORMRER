@@ -1,7 +1,7 @@
 void intro() {
-  background(background);
   textAlign(CENTER);
   rectMode(CENTER);
+  image(myGif, 0, 0, width, height);
 
   fill(intro);
   noStroke();
@@ -16,17 +16,17 @@ void intro() {
   fill(intro);
   textSize(42);
   text("Super Mario", width/2, height/2+16);
-//  textSize(19);
-//  text("Click to start", width/2, height/2+35);
+  //  textSize(19);
+  //  text("Click to start", width/2, height/2+35);
 
   fill(255);
   textSize(40);
   text("Super Mario", width/2, height/2+13);
-//  textSize(18);
-//  text("Click to start", width/2, height/2+35);
-  
-//  fill(green);
-//  rect(width/2, height-50, 800, 100);
+  //  textSize(18);
+  //  text("Click to start", width/2, height/2+35);
+
+  //  fill(green);
+  //  rect(width/2, height-50, 800, 100);
 }
 
 void introClicks() {

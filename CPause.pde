@@ -1,8 +1,9 @@
 void pause() {
-  background(background);
+  //background(background);
   pausecontinuebutton();
   pausepanel();
-  drawLives(player.lives); 
+
+  drawLives(player.lives);
 }
 
 void pauseClicks() {
@@ -17,8 +18,11 @@ void pauseClicks() {
 
 void pausecontinuebutton() {
   fill(255);
+  noStroke();
+  circle(20, 20, 19);
+  fill(255);
   stroke(0);
-  triangle(15, 15, 15, 25, 25, 20);
+  triangle(16, 15, 16, 25, 26, 20);
 }
 
 void pausepanel() {

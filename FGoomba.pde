@@ -36,6 +36,8 @@ class FGoomba extends FGameObject {
       } else {
         player.lives--;
         player.setPosition(96, 220);
+        player.canmove = false;
+        player.timer = 100;
       }
     }
   }

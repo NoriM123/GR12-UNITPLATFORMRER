@@ -3,8 +3,12 @@ void game() {
   drawWorld();
   actWorld();
   player.act();
-  pausebutton();
-  
+
+  if (mode == 1) {
+    pausebutton();
+  }
+
+
   drawLives(player.lives);
 }
 
@@ -15,7 +19,11 @@ void gameClicks() {
 }
 
 void pausebutton() {
-  
+
+  fill(255);
+  noStroke();
+  circle(20, 20, 19);
+
   fill(255);
   stroke(0);
   rect(17, 20, 3, 10, 5);

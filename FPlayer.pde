@@ -4,7 +4,10 @@ class FPlayer extends FGameObject {
 
   int frame;
   int direction;
+  int portalCooldown = 0;
   int lives;
+  int timer = 0;
+  boolean canmove = true;
 
   boolean touchground;
   int jumps = 0;
@@ -17,12 +20,13 @@ class FPlayer extends FGameObject {
     setName("player");
     setRotatable(false);
     attachImage(idle[0]);
-   // bottomssensor();
+    // bottomssensor();
   }
   void act() {
+    if (portalCooldown > 0) portalCooldown--;
     input();
     animate();
-  //  bottomSensor.setPosition(getX(), getY() + getHeight()/2 + 2);
+    //  bottomSensor.setPosition(getX(), getY() + getHeight()/2 + 2);
     collisions();
 
     if (isTouching("stonebricks") || isTouching("ice") || isTouching("treetopw") || isTouching("treetopL") || isTouching("treetopr") || isTouching("bridge") || isTouching("intersec") || isTouching("springss") || isTouching("topg") || isTouching("grasstl") || isTouching("grasstr") ||isTouching("wall")) {
@@ -36,6 +40,13 @@ class FPlayer extends FGameObject {
     if (lives <= 0) {
       mode = 4;
       lives = 3;
+    }
+
+    if (timer > 0) {
+      timer--;
+      canmove = false;
+    } else if (timer <= 0) {
+      canmove = true;
     }
   }
 
@@ -65,22 +76,22 @@ class FPlayer extends FGameObject {
     if (abs(vy) < 0.1) {
       action = idle;
     }
-    if (akey) {
+    if (akey && canmove) {
       setVelocity(-200, vy);
       action = run;
       direction = L;
     }
-    if (dkey) {
+    if (dkey && canmove) {
       setVelocity(200, vy);
       action = run;
       direction = R;
     }
-    if (wkey && (touchground || jumps == 1)) {
+    if (wkey && canmove && (touchground || jumps == 1)) {
       setVelocity(vx, -350);
       jumps = jumps + 1;
       touchground = false;
     }
-    if (abs(vy) > 0.1)
+    if (abs(vy) > 0.1 && canmove)
       action = jump;
   }
 
@@ -90,6 +101,8 @@ class FPlayer extends FGameObject {
       lives--;
       setVelocity(0, 0);
       setPosition(96, 220);
+      player.canmove = false;
+      player.timer = 100;
     }
   }
 }
