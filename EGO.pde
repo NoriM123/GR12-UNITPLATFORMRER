@@ -1,5 +1,22 @@
 void gameover() {
- // background(background);
+  gameoverart();
+}
+
+void gameoverClicks() {
+  if (mouseX> width/2 - 200 && mouseX<width/2+200 && mouseY>height/2 - 50 && mouseY<height/2 +50) {
+    setup();
+    drops = false;
+    drop = null;
+    koopadrops = false;
+    kdrop = null;
+    hasShell = false; 
+    hasStar = false;
+    mode = 0;
+  }
+}
+
+void gameoverart() {
+  // background(background);
 
   fill(intro);
   noStroke();
@@ -15,12 +32,5 @@ void gameover() {
   text("Play Again", width/2, height/2+16);
   fill(255);
   textSize(42);
-  text("Play Again", width/2, height/2+13);
-}
-
-void gameoverClicks() {
-  if (mouseX> width/2 - 200 && mouseX<width/2+200 && mouseY>height/2 - 50 && mouseY<height/2 +50) {
-    setup();
-    mode = 0;
-  }
+  text("Play Again", width/2, height/2+13); 
 }

@@ -1,6 +1,4 @@
 void gamewin() {
- // background(background);
-
   fill(intro);
   noStroke();
   rect(width/2-5, height/2+5, 400, 100);

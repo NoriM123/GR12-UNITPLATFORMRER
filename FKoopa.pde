@@ -1,14 +1,16 @@
-class FGoomba extends FGameObject {
+class FKoopa extends FGameObject {
   int direction = L;
   int speed = 50;
   int frame = 0;
+  boolean activated = false;
+  FCircle kd;
 
-  FGoomba(float x, float y) {
+  FKoopa(float x, float y) {
     super(gridSize, gridSize);
     setPosition(x, y);
-    setName("goomba");
+    setName("koopa");
     setRotatable(false);
-    attachImage(goomba[0]);
+    attachImage(koopa[0]);
   }
   void act() {
     animate();
@@ -16,10 +18,10 @@ class FGoomba extends FGameObject {
     move();
   }
   void animate() {
-    if (frame >= goomba.length) frame = 0;
+    if (frame >= koopa.length) frame = 0;
     if (frameCount %5 == 0) {
-      if (direction == R) attachImage(goomba[frame]);
-      if (direction == L) attachImage(reversingImage(goomba[frame]));
+      if (direction == R) attachImage(koopa[frame]);
+      if (direction == L) attachImage(reversingImage(koopa[frame]));
       frame++;
     }
   }
@@ -30,6 +32,8 @@ class FGoomba extends FGameObject {
     }
     if (isTouching("player")) {
       if (player.getY() < getY()-gridSize/2) {
+        activated = true;
+        KoopaDrop(getX(), getY() - gridSize/2 - 12);
         world.remove(this);
         enemies.remove(this);
         player.setVelocity(player.getVelocityX(), -300);
