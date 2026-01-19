@@ -4,8 +4,9 @@ void game() {
   actWorld();
   player.act();
   checkDropRemove();
+  checkKDropRemove();
+  checkhDropRemove();
   images();
-
 
   drawLives(player.lives);
 }

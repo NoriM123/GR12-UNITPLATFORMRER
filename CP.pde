@@ -17,6 +17,9 @@ void pauseClicks() {
     kdrop = null;
     hasShell = false; 
     hasStar = false;
+    hdrop = null;
+    heartdrops = false;
+    
     mode = 0;
   }
 }

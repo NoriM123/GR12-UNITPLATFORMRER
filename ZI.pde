@@ -46,6 +46,12 @@ void mouseReleased() {
 }
 
 void drawLives(int lives) {
+  if (lives == 4) {
+    image(heart1, 36+33+33, height-35);
+    image(heart, 36+33, height - 35);
+    image(heart, 37, height - 35);
+    image(heart, 6, height - 35);
+  }
   if (lives == 3) {
     image(heart, 36+33, height - 35);
     image(heart, 37, height - 35);
@@ -58,6 +64,6 @@ void drawLives(int lives) {
   }
 
   if (lives == 1) {
-    image(heart, 6, height - 25);
+    image(heart, 6, height - 35);
   }
 }

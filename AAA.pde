@@ -4,14 +4,14 @@ import ddf.minim.*;
 FWorld world;
 FPortal portalIn;
 FPortalO portalOut;
-FCircle drop, kdrop;
-Gif myGif, mmyGif;
+FCircle drop, kdrop, hdrop;
+Gif myGif, mmyGif, mmmyGif;
 
 ArrayList<FGameObject> terrain;
 ArrayList<FGameObject> enemies;
 ArrayList<FCircle> fireballs = new ArrayList<FCircle>();
 
-boolean drops, koopadrops, touched, falling, hasStar, hasShell, starpower = false;
+boolean drops, heartdrops, koopadrops, touched, falling, hasStar, hasShell, starpower = false;
 boolean upkey, downkey, leftkey, rightkey, wkey, akey, skey, spacekey, dkey, escape;
 
 PFont myFont;
@@ -21,9 +21,9 @@ int gridSize = 32;
 int starpowertimer, starcd = 0;
 float zoom = 1.5;
 
-PImage bat, fireball, heart, star, background, gc, gr, gt, gtr, gtl, gb, gbr, gbl, gl, map, ice, stone, treeTrunk, spring, treetopm, treetopl, treetopr, bridgec, bridgeintersection, spike, cloud, wall, teleport, teleports, starbackground, shell;
+PImage chute1, chute2, heart1, tramp3, one, two, three, four, bat, fireball, heart, star, background, gc, gr, gt, gtr, gtl, gb, gbr, gbl, gl, map, ice, stone, treeTrunk, spring, treetopm, treetopl, treetopr, bridgec, bridgeintersection, spike, cloud, wall, teleport, teleports, starbackground, shell;
 
-PImage[] idle, jump, run, action, goomba, gif, lava, thwomp, luckybox, koopa;
+PImage[] idle, jump, run, action, goomba, gif, lava, water, thwomp, luckybox, koopa, lifebox;
 
 
 FPlayer player;
@@ -43,6 +43,8 @@ void setup() {
   myGif.loop();
   mmyGif = new Gif(this, "2gif.gif");
   mmyGif.loop();
+  mmmyGif = new Gif(this, "3gif.gif");
+  mmmyGif.loop();
 }
 
 void loadImages() {
@@ -51,7 +53,7 @@ void loadImages() {
   heart.resize(32, 32);
   bat = loadImage("bat2.png");
   bat.resize(50, 50);
-  map = loadImage("Untitled (1).png");
+  map = loadImage("Untitled.png");
   ice = loadImage("blueBlock.png");
   treeTrunk = loadImage("tree_trunk.png");
   ice.resize(32, 32);
@@ -62,11 +64,19 @@ void loadImages() {
   treetopr = loadImage("treetop_e.png");
   bridgec = loadImage("bridge_center.png");
   spike = loadImage("spike.png");
+  spike.resize(32, 30);
   bridgeintersection = loadImage("tree_intersect.png");
   spring = loadImage("trampoline.png");
   wall = loadImage("wall.png");
   fireball = loadImage("fireball.png");
   fireball.resize(32, 32);
+  tramp3 = loadImage("trampoline3.png");
+  heart1 = loadImage("hart1.png");
+  heart1.resize(32, 32);
+  chute1 = loadImage("Chute1.png");
+  chute2 = loadImage("Chute1 copy.png");
+  chute1.resize(gridSize * 2, gridSize * 2);
+  chute2.resize(gridSize * 2, gridSize * 2);
 
   gc = loadImage("dirt_center.png");
   gr = loadImage("dirt_e.png");
@@ -78,8 +88,11 @@ void loadImages() {
   gbl = loadImage("dirt_sw.png");
   gl = loadImage("dirt_w.png");
   star = loadImage("bigbigstar.png");
-
   shell = loadImage("shell.png");
+  one = loadImage("one.png");
+  two = loadImage("two.png");
+  three = loadImage("three.png");
+  four = loadImage("four.png");
 
   teleport = loadImage("gold.png");
   teleports = loadImage("gold copy.png");
@@ -104,10 +117,19 @@ void loadImages() {
   goomba[1].resize(gridSize, gridSize);
 
   lava = new PImage[6];
-  for (int i = 0; i < 6; i++) {
-    lava[i] = loadImage("lava" + (i) + ".png");
-  }
+  lava[0] = loadImage("lava0.png");
+  lava[1] = loadImage("lava1.png");
+  lava[2] = loadImage("lava2.png");
+  lava[3] = loadImage("lava3.png");
+  lava[4] = loadImage("lava4.png");
+  lava[5] = loadImage("lava5.png");
   lava[5].resize(gridSize, gridSize);
+
+  water = new PImage[4];
+  water[0] = loadImage("water0.png");
+  water[1] = loadImage("water1.png");
+  water[2] = loadImage("water2.png");
+  water[3] = loadImage("water3.png");
 
   thwomp = new PImage[2];
   thwomp[0] = loadImage("thwomp0.png");
@@ -118,6 +140,10 @@ void loadImages() {
   luckybox = new PImage[2];
   luckybox[0] = loadImage("luckybox0.png");
   luckybox[1] = loadImage("luckybox1.png");
+
+  lifebox = new PImage[2];
+  lifebox[0] = loadImage("lifebox0.png");
+  lifebox[1] = loadImage("lifebox1.png");
 
   koopa = new PImage[2];
   koopa[0] = loadImage("koopa0.png");
@@ -136,7 +162,7 @@ void loadWorld(PImage img) {
       b.setStatic(true);
       if (c == black) {
         b.attachImage(stone);
-        b.setFriction(6);
+        b.setFriction(21);
         b.setName("stonebricks");
         world.add(b);
       } else if (c == cyan) {
@@ -152,16 +178,16 @@ void loadWorld(PImage img) {
       } else if (c == #00FF00) {//green//
         b.attachImage(treetopm);
         b.setName("treetopw");
-        b.setFriction(4);
+        b.setFriction(6);
         world.add(b);
       } else if (c == #095D02) {
         b.attachImage(treetopl);
-        b.setFriction(4);
+        b.setFriction(6);
         b.setName("treetopL");
         world.add(b);
       } else if (c == #2FA025) {
         b.attachImage(treetopr);
-        b.setFriction(4);
+        b.setFriction(6);
         b.setName("treetopr");
         world.add(b);
       } else if (c == #5D2400) {
@@ -173,16 +199,16 @@ void loadWorld(PImage img) {
       } else if (c == #A2A2A2) {
         b.attachImage(spike);
         b.setName("spikes");
+        b.setPosition(x*gridSize, y*gridSize+2);
         world.add(b);
       } else if (c == pink) {
         b.attachImage(bridgeintersection);
         b.setName("intersec");
         world.add(b);
       } else if (c == reds) {
-        b.attachImage(spring);
-        b.setName("springss");
-        b.setRestitution(2);
-        world.add(b);
+        FSpring sp = new FSpring(x * gridSize, y * gridSize);
+        terrain.add(sp);
+        world.add(sp);
       } else if (c == yellowC) {
         b.attachImage(gc);
         b.setName("Centerc");
@@ -232,7 +258,7 @@ void loadWorld(PImage img) {
         b.attachImage(wall);
         b.setName("wall");
         world.add(b);
-        b.setFriction(6);
+        b.setFriction(18);
       } else if (c == browny) {
         FGoomba gmb = new FGoomba(x*gridSize, y*gridSize);
         enemies.add(gmb);
@@ -240,14 +266,14 @@ void loadWorld(PImage img) {
       } else if (c== dirtyellow) {
         portalIn = new FPortal(x*gridSize, y*gridSize);
         terrain.add(portalIn);
-        portalIn.attachImage(teleport);
+        portalIn.attachImage(chute1);
         portalIn.setFriction(6);
         portalIn.setName("FPortals");
         world.add(portalIn);
       } else if (c== red) {
         portalOut = new FPortalO(x*gridSize, y*gridSize);
         terrain.add(portalOut);
-        portalOut.attachImage(teleports);
+        portalOut.attachImage(chute2);
         portalOut.setFriction(6);
         portalOut.setName("FPortalO");
         world.add(portalOut);
@@ -255,6 +281,10 @@ void loadWorld(PImage img) {
         FLava lav = new FLava(x*gridSize, y*gridSize);
         terrain.add(lav);
         world.add(lav);
+      } else if (c== #0000FF) {
+        FWater wa = new FWater(x*gridSize, y*gridSize);
+        terrain.add(wa);
+        world.add(wa);
       } else if (c == #B4B4B4) {
         FThwomp thw = new FThwomp(gridSize*x+10+6, gridSize*y+10+6);
         enemies.add(thw);
@@ -263,10 +293,36 @@ void loadWorld(PImage img) {
         FLuckyBox lb = new FLuckyBox(gridSize*x, gridSize*y);
         terrain.add(lb);
         world.add(lb);
+      } else if (c == #500000) {
+        FLifeBox lib = new FLifeBox(gridSize*x, gridSize*y);
+        terrain.add(lib);
+        world.add(lib);
       } else if (c == #007E83) {
         FKoopa kp = new FKoopa(gridSize*x, gridSize*y);
         enemies.add(kp);
         world.add(kp);
+      } else if (c == #100000) {
+        b.attachImage(one);
+        b.setPosition(x*gridSize-4, y*gridSize);
+        b.setName("one");
+        b.setFriction(6);
+        world.add(b);
+      } else if (c == #200000) {
+        b.attachImage(two);
+        b.setName("two");
+        b.setFriction(6);
+        world.add(b);
+      } else if (c == #300000) {
+        b.attachImage(three);
+        b.setName("three");
+        b.setFriction(6);
+        world.add(b);
+      } else if (c == #400000) {
+        b.attachImage(four);
+        b.setPosition(x*gridSize+4, y*gridSize);
+        b.setName("four");
+        b.setFriction(6);
+        world.add(b);
       }
     }
   }
@@ -302,6 +358,16 @@ void actWorld() {
     FGameObject e = enemies.get(i);
     e.act();
   }
+  for (int i = fireballs.size() - 1; i >= 0; i--) {
+    FCircle fb = fireballs.get(i);
+
+    fb.addForce(0, -100);
+
+    if (fb.getY() > 3000 || fb.getX() < -3000 || fb.getX() > 3000) {
+      world.remove(fb);
+      fireballs.remove(i);
+    }
+  }
 }
 
 void drawWorld() {
@@ -310,6 +376,32 @@ void drawWorld() {
   world.step();
   world.draw();
   popMatrix();
+}
+
+void heartDrop(float x, float y) {
+  if (hdrop != null) return;
+
+  hdrop = new FCircle(10);
+  hdrop.setPosition(x, y);
+  hdrop.setVelocity(random(-200, 200), -300);
+  hdrop.setName("heartdrop");
+  hdrop.setRotatable(false);
+  hdrop.setStatic(false);
+  hdrop.setSensor(false);
+  hdrop.setDensity(2);
+  hdrop.setFriction(0.2);
+  hdrop.setRestitution(0.5);
+  hdrop.attachImage(heart);
+
+  world.add(hdrop);
+}
+
+void checkhDropRemove() {
+  if (heartdrops && hdrop != null) {
+    world.remove(hdrop);
+    hdrop = null;
+    heartdrops = false;
+  }
 }
 
 void sDrop(float x, float y) {
@@ -366,9 +458,10 @@ void shootfireball() {
   fb.setName("fireball");
   fb.setRotatable(true);
   fb.setStatic(false);
-  fb.setSensor(false);
+  fb.setSensor(true);
   fb.setDensity(1);
-  fb.setFriction(0);
+  fb.setFriction(0.2);
+  fb.setAngularVelocity(20);
   fb.attachImage(fireball);
   fb.setRestitution(0.9);
 

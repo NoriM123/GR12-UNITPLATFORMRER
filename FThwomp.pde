@@ -32,14 +32,42 @@ class FThwomp extends FGameObject {
     if (issTouching(thwompSensor, "player")) {
       Sense = true;
     }
-
-    moveThwomp();
-    animate();
+    if (Sense) {
+      attachImage(thwomp[1]);
+    } else {
+      attachImage(thwomp[0]);
+    }
+    moveThwomp1();
   }
 
-  void animate() {
-    if (Sense) attachImage(thwomp[1]);
-    else attachImage(thwomp[0]);
+  void moveThwomp1() {
+    if (Sense && !falling && !rising) {
+      falling = true;
+      setStatic(false);
+      setVelocity(0, 100);
+    }
+    if (isTouching("stonebricks")) {
+      setVelocity(0, 0);
+      falling = false;
+      rising = true;
+      Sense = false;
+    }
+    if (rising) {
+      setVelocity(0, -100);
+      if (getY() <= startY) {
+        setPosition(getX(), startY);
+        setVelocity(0, 0);
+        setStatic(true);
+        rising = false;
+      }
+    }
+    if (isTouching("player")) {
+      player.setPosition(96, 100);
+      player.setVelocity(0, 0);
+      player.canmove = false;
+      player.timer = 100;
+      touched = true;
+    }
   }
 
   void moveThwomp() {
@@ -49,13 +77,14 @@ class FThwomp extends FGameObject {
       setVelocity(0, 100);
     }
 
-    if (falling && isTouching("floor") || isTouching("player")) {
+    if (falling && isTouching("stonebricks") || isTouching("player")) {
       setVelocity(0, 0);
       falling = false;
       rising = true;
     }
+
     if (isTouching("player")) {
-      player.setPosition(96, 220);
+      player.setPosition(96, 100);
       player.setVelocity(0, 0);
       player.canmove = false;
       player.timer = 100;
@@ -69,6 +98,7 @@ class FThwomp extends FGameObject {
         setVelocity(0, 0);
         setStatic(true);
         rising = false;
+        falling = false;
         Sense = false;
       }
     }

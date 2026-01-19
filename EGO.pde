@@ -9,15 +9,17 @@ void gameoverClicks() {
     drop = null;
     koopadrops = false;
     kdrop = null;
-    hasShell = false; 
+    hasShell = false;
     hasStar = false;
+    hdrop = null;
+    heartdrops = false;
     mode = 0;
   }
 }
 
 void gameoverart() {
   // background(background);
-
+  image(mmmyGif, 0, 0, width, height);
   fill(intro);
   noStroke();
   rect(width/2-5, height/2+5, 400, 100);
@@ -32,5 +34,5 @@ void gameoverart() {
   text("Play Again", width/2, height/2+16);
   fill(255);
   textSize(42);
-  text("Play Again", width/2, height/2+13); 
+  text("Play Again", width/2, height/2+13);
 }

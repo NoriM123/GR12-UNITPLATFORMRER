@@ -20,7 +20,7 @@ class FPlayer extends FGameObject {
     super(gridSize, gridSize);
     frame = 0;
     lives = 3;
-    setPosition(96, 220);
+    setPosition(96, 100);
     setName("player");
     setRotatable(false);
     attachImage(idle[0]);
@@ -70,7 +70,7 @@ class FPlayer extends FGameObject {
     if (lavaCooldown > 0) lavaCooldown--;
     input();
     animate();
-    footSensor.setPosition(player.getX(), player.getY()+13);
+    footSensor.setPosition(player.getX(), player.getY()+12);
     footSensor.setVelocity(player.getVelocityX(), player.getVelocityY());
 
     headSensor.setPosition(player.getX(), player.getY()-14);
@@ -81,15 +81,12 @@ class FPlayer extends FGameObject {
 
     collisions();
 
-
+    touchground = false;
     if (issTouching(footSensor, "luckybox") ||issTouching(footSensor, "FPortalO") ||issTouching(footSensor, "FPortals")||issTouching(footSensor, "stonebricks") || issTouching(footSensor, "ice")|| issTouching(footSensor, "wall") || issTouching(footSensor, "treetopw") || issTouching(footSensor, "treetopL") || issTouching(footSensor, "treetopr") || issTouching(footSensor, "bridge") || issTouching(footSensor, "intersec") || issTouching(footSensor, "springss") || issTouching(footSensor, "topg") || issTouching(footSensor, "grasstl") || issTouching(footSensor, "grasstr") ||issTouching(footSensor, "wall")) {
       touchground = true;
     }
 
-    inLiquid = issTouching(liquids, "lava");
-    if (inLiquid) {
-      println("in");
-    }
+    inLiquid = issTouching(liquids, "lava") || issTouching(liquids, "water");
 
     if (jumps == 3) {
       jumps = 0;
@@ -101,7 +98,7 @@ class FPlayer extends FGameObject {
     }
 
     if (timer2 == 1) {
-      setPosition(96, 220);
+      setPosition(96, 100);
     }
     if (timer2 > 0) {
       timer--;
@@ -154,28 +151,32 @@ class FPlayer extends FGameObject {
 
 
   void collisions() {
+    if (getY()>2000) {
+      lives = 0;
+    }
     if (issTouching(footSensor, "spikes")) {
       lives--;
       setVelocity(0, 0);
-      setPosition(96, 220);
+      setPosition(96, 100);
       player.canmove = false;
       player.timer = 100;
     }
 
     if (issTouching(footSensor, "FPortals") && player.portalCooldown == 0) {
-      player.setPosition(portalOut.getX(), portalOut.getY() - 100);
+      player.setPosition(portalOut.getX(), portalOut.getY()-50);
       player.setVelocity(0, 0);
       player.canmove = false;
       player.timer = 100;
-      player.portalCooldown = 300;
+      player.portalCooldown = 500;
     }
 
+
     if (issTouching(footSensor, "FPortalO") && player.portalCooldown == 0) {
-      player.setPosition(portalIn.getX(), portalIn.getY() - 100);
+      player.setPosition(portalIn.getX(), portalIn.getY() -50);
       player.setVelocity(0, 0);
       player.canmove = false;
       player.timer = 100;
-      player.portalCooldown = 300;
+      player.portalCooldown = 500;
     }
     if (issTouching(liquids, "lava") && lavaCooldown == 0) {
       lives--;
@@ -197,6 +198,15 @@ class FPlayer extends FGameObject {
     if (isTouching("koopadrop")) {
       hasShell = true;
       koopadrops = true;
+      if (kdrop != null) {
+        world.remove(kdrop);
+        kdrop = null;
+      }
+    }
+    if (hdrop != null && isTouching("heartdrop")) {
+      lives++;
+      world.remove(hdrop);
+      hdrop = null;
     }
   }
 }

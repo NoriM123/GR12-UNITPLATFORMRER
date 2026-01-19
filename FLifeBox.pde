@@ -1,21 +1,21 @@
-class FLuckyBox extends FGameObject {
+class FLifeBox extends FGameObject {
 
   boolean activated = false;
   boolean bouncing = false;
   float baseY;
   int bounceTimer = 0;
 
-  FLuckyBox(float x, float y) {
+  FLifeBox(float x, float y) {
     super(gridSize, gridSize);
     setPosition(x, y);
-    setName("luckybox");
+    setName("LifeBox");
     setStatic(true);
-    attachImage(luckybox[0]);
+    attachImage(lifebox[0]);
     baseY = y;
   }
 
   void act() {
-    if (!activated && issTouching(player.headSensor, "luckybox")) {
+    if (!activated && issTouching(player.headSensor, "LifeBox")) {
       activated = true;
       onHit();
     }
@@ -36,8 +36,8 @@ class FLuckyBox extends FGameObject {
   }
 
   void onHit() {
-    attachImage(luckybox[1]);
-    sDrop(getX(), getY() - gridSize/2 - 12);
+    attachImage(lifebox[1]);
+    heartDrop(getX(), getY() - gridSize/2 - 12);
     bouncing = true;
     bounceTimer = 12;
   }
