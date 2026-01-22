@@ -1,53 +1,111 @@
 class FKoopa extends FGameObject {
+
   int direction = L;
-  int speed = 50;
+  float walkSpeed  = 50;
+  float shellSpeed = 300;
+
+  int state;
+  final int WALK = 0;
+  final int SHELLSTILL = 1;
+  final int SHELLMOVING = 2;
+
   int frame = 0;
-  boolean activated = false;
-  FCircle kd;
 
   FKoopa(float x, float y) {
     super(gridSize, gridSize);
     setPosition(x, y);
     setName("koopa");
     setRotatable(false);
-    attachImage(koopa[0]);
+    setFriction(0);
+    setRestitution(0);
+    state = WALK;
   }
+
+
   void act() {
+    if (isTouching("fireball")) {
+      world.remove(this);
+      enemies.remove(this);
+    }
     animate();
     collide();
     move();
   }
+
   void animate() {
+    if (state != WALK) {
+      attachImage(shell);
+      return;
+    }
+
     if (frame >= koopa.length) frame = 0;
-    if (frameCount %5 == 0) {
+    if (frameCount % 5 == 0) {
       if (direction == R) attachImage(koopa[frame]);
       if (direction == L) attachImage(reversingImage(koopa[frame]));
       frame++;
     }
   }
+
+  void move() {
+    float vy = getVelocityY();
+
+    if (state == WALK) {
+      setVelocity(walkSpeed * direction, vy);
+    } else if (state == SHELLMOVING) {
+      setVelocity(shellSpeed * direction, vy);
+    } else {
+      setVelocity(0, vy);
+    }
+  }
+
   void collide() {
     if (isTouching("wall")) {
-      direction *= -1;
-      setPosition(getX()+direction, getY());
+      if (state != SHELLSTILL) {
+        direction *= -1;
+        setPosition(getX() + direction * 2, getY());
+      }
     }
-    if (isTouching("player")) {
-      if (player.getY() < getY()-gridSize/2) {
-        activated = true;
-        KoopaDrop(getX(), getY() - gridSize/2 - 12);
+
+
+    boolean stomp = false;
+    
+        if (!isTouching("player")) stomp = false;
+
+    if (state == WALK && isTouching("fireball")) {
+      state = SHELLSTILL;
+    }
+
+    if (issTouching(player.footSensor, "koopa") || isTouching("fireball")) {
+      stomp = true;
+    }
+
+
+    if (stomp) {
+      if (state == WALK) {
+        state = SHELLSTILL;
+        player.setVelocity(player.getVelocityX(), -300);
+      }
+
+      if (state == SHELLMOVING) {
+        state = SHELLSTILL;
+        player.setVelocity(player.getVelocityX(), -300);
+      }
+
+      if (state == SHELLSTILL) {
         world.remove(this);
         enemies.remove(this);
         player.setVelocity(player.getVelocityX(), -300);
-      } else {
-        player.lives--;
-        player.setVelocity(0, 0);
-        player.setPosition(96, 100);
-        player.canmove = false;
-        player.timer = 100;
       }
     }
-  }
-  void move() {
-    float vy = getVelocityY();
-    setVelocity(speed*direction, vy);
+
+    if (state == WALK) {
+      player.lives--;
+      player.setPosition(respawnX, respawnY);
+    }
+
+    if (state == SHELLSTILL) {
+      state = SHELLMOVING;
+      direction = (player.getX() < getX()) ? R : L;
+    }
   }
 }

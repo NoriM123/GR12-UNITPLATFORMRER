@@ -1,30 +1,32 @@
-class FGoomba extends FGameObject {
+class FHammer extends FGameObject {
   int direction = L;
   int speed = 50;
   int frame = 0;
 
-  FGoomba(float x, float y) {
-    super(gridSize, gridSize);
+  int throwcooldown = 0;
+
+  FHammer(float x, float y) {
+    super(gridSize-15, gridSize);
     setPosition(x, y);
-    setName("goomba");
+    setName("Hammerbro");
     setRotatable(false);
-    attachImage(goomba[0]);
+    attachImage(hammerb[0]);
   }
   void act() {
-    animate();
-    collide();
-    move();
-
     if (isTouching("fireball")) {
       world.remove(this);
       enemies.remove(this);
     }
+    animate();
+    collide();
+    move();
+    hammers();
   }
   void animate() {
-    if (frame >= goomba.length) frame = 0;
+    if (frame >= hammerb.length) frame = 0;
     if (frameCount %5 == 0) {
-      if (direction == R) attachImage(goomba[frame]);
-      if (direction == L) attachImage(reversingImage(goomba[frame]));
+      if (direction == R) attachImage(hammerb[frame]);
+      if (direction == L) attachImage(reversingImage(hammerb[frame]));
       frame++;
     }
   }
@@ -52,5 +54,26 @@ class FGoomba extends FGameObject {
   void move() {
     float vy = getVelocityY();
     setVelocity(speed*direction, vy);
+  }
+  void hammers() {
+    if (isSensor()) return;
+
+    if (throwcooldown > 0) {
+      throwcooldown--;
+      return;
+    }
+
+    throwcooldown = 150;
+
+    FGameObject hammer = new FGameObject(20, 20);
+    hammer.setPosition(getX(), getY() - gridSize/2);
+    hammer.setVelocity(200 * direction, -500);
+    hammer.setAngularVelocity(30 * direction);
+    hammer.setSensor(true);
+    hammer.setRestitution(0.4);
+    hammer.attachImage(hammerbro);
+    hammer.setName("hammer");
+
+    world.add(hammer);
   }
 }

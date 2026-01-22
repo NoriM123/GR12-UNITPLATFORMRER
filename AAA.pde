@@ -1,15 +1,19 @@
 import fisica.*;
 import gifAnimation.*;
 import ddf.minim.*;
+Minim minim;
 FWorld world;
 FPortal portalIn;
 FPortalO portalOut;
 FCircle drop, kdrop, hdrop;
 Gif myGif, mmyGif, mmmyGif;
 
+float respawnX = 496;
+float respawnY = 100;
+
 ArrayList<FGameObject> terrain;
 ArrayList<FGameObject> enemies;
-ArrayList<FCircle> fireballs = new ArrayList<FCircle>();
+ArrayList<FCircle> fireballs;
 
 boolean drops, heartdrops, koopadrops, touched, falling, hasStar, hasShell, starpower = false;
 boolean upkey, downkey, leftkey, rightkey, wkey, akey, skey, spacekey, dkey, escape;
@@ -18,22 +22,37 @@ PFont myFont;
 
 int numberOfFrames, nnumberofframes, f, v, r;
 int gridSize = 32;
+int times100 = 0;
 int starpowertimer, starcd = 0;
 float zoom = 1.5;
 
-PImage chute1, chute2, heart1, tramp3, one, two, three, four, bat, fireball, heart, star, background, gc, gr, gt, gtr, gtl, gb, gbr, gbl, gl, map, ice, stone, treeTrunk, spring, treetopm, treetopl, treetopr, bridgec, bridgeintersection, spike, cloud, wall, teleport, teleports, starbackground, shell;
+PImage finish, lilguy, hammerbro, chute1, chute2, heart1, tramp3, one, two, three, four, bat, fireball, heart, star, background, gc, gr, gt, gtr, gtl, gb, gbr, gbl, gl, map, ice, stone, treeTrunk, spring, treetopm, treetopl, treetopr, bridgec, bridgeintersection, spike, cloud, wall, teleport, teleports, starbackground, shell;
 
-PImage[] idle, jump, run, action, goomba, gif, lava, water, thwomp, luckybox, koopa, lifebox;
-
+PImage[] idle, jump, run, action, goomba, gif, lava, water, thwomp, luckybox, koopa, lifebox, hammerb;
 
 FPlayer player;
 
+AudioPlayer kills, jumpss, wins, gameovers, falls, thwomps, themes, checkmark;
+
 void setup() {
+  minim = new Minim(this);
+  jumpss = minim.loadFile("jump.wav");
+  wins = minim.loadFile("win.wav");
+  kills = minim.loadFile("kill.wav");
+  gameovers = minim.loadFile("gameover.wav");
+  thwomps = minim.loadFile("thwomp.mp3");
+  themes = minim.loadFile("theme.mp3");
+  checkmark = minim.loadFile("checkmark.mp3");
+
+  themes.rewind();
+  themes.play();
+  themes.loop();
   size(1300, 800, P2D);
   mode = 0;
   Fisica.init(this);
   terrain = new ArrayList<FGameObject> ();
   enemies = new ArrayList<FGameObject> ();
+  fireballs  = new ArrayList<FCircle>();
   loadImages();
   myFont = createFont("PLANK___.TTF", 100);
   textFont(myFont);
@@ -48,6 +67,7 @@ void setup() {
 }
 
 void loadImages() {
+  finish = loadImage("gold.png");
   background = loadImage("superfinal.png");
   heart = loadImage("hart.png");
   heart.resize(32, 32);
@@ -77,6 +97,7 @@ void loadImages() {
   chute2 = loadImage("Chute1 copy.png");
   chute1.resize(gridSize * 2, gridSize * 2);
   chute2.resize(gridSize * 2, gridSize * 2);
+  hammerbro = loadImage("hammer.png");
 
   gc = loadImage("dirt_center.png");
   gr = loadImage("dirt_e.png");
@@ -93,7 +114,7 @@ void loadImages() {
   two = loadImage("two.png");
   three = loadImage("three.png");
   four = loadImage("four.png");
-
+  lilguy = loadImage("littelboy.png");
   teleport = loadImage("gold.png");
   teleports = loadImage("gold copy.png");
 
@@ -148,10 +169,14 @@ void loadImages() {
   koopa = new PImage[2];
   koopa[0] = loadImage("koopa0.png");
   koopa[1] = loadImage("koopa1.png");
+
+  hammerb = new PImage[2];
+  hammerb[0] = loadImage("hammerbro0.png");
+  hammerb[1] = loadImage("hammerbro1.png");
 }
 
 void loadWorld(PImage img) {
-  world = new FWorld(-2000, -2000, 2000, 2000);
+  world = new FWorld(-2600, -2600, 2600, 2600);
   world.setGravity(0, 900);
 
   for (int y = 0; y < map.height; y++) {
@@ -175,7 +200,7 @@ void loadWorld(PImage img) {
         b.setSensor(true);
         b.setName("treetrunk");
         world.add(b);
-      } else if (c == #00FF00) {//green//
+      } else if (c == #00FF00) {
         b.attachImage(treetopm);
         b.setName("treetopw");
         b.setFriction(6);
@@ -263,6 +288,10 @@ void loadWorld(PImage img) {
         FGoomba gmb = new FGoomba(x*gridSize, y*gridSize);
         enemies.add(gmb);
         world.add(gmb);
+      } else if (c==#900000) {
+        FHammer hb = new FHammer(x*gridSize, y*gridSize);
+        enemies.add(hb);
+        world.add(hb);
       } else if (c== dirtyellow) {
         portalIn = new FPortal(x*gridSize, y*gridSize);
         terrain.add(portalIn);
@@ -323,6 +352,19 @@ void loadWorld(PImage img) {
         b.setName("four");
         b.setFriction(6);
         world.add(b);
+      } else if (c == #AA00FF) {
+        FBox cp = new FBox(gridSize, gridSize);
+        cp.setPosition(x * gridSize, y * gridSize);
+        cp.setStatic(true);
+        cp.setSensor(true);
+        cp.attachImage(lilguy);
+        cp.setName("checkpoint");
+        world.add(cp);
+      } else if (c==#990000) {
+        b.setPosition(x*gridSize, y*gridSize);
+        b.setName("finishs");
+        b.attachImage(finish);
+        world.add(b);
       }
     }
   }
@@ -361,9 +403,16 @@ void actWorld() {
   for (int i = fireballs.size() - 1; i >= 0; i--) {
     FCircle fb = fireballs.get(i);
 
-    fb.addForce(0, -100);
-
     if (fb.getY() > 3000 || fb.getX() < -3000 || fb.getX() > 3000) {
+      world.remove(fb);
+      fireballs.remove(i);
+    }
+
+    if (player.isssTouching(fb, "goomba") || player.isssTouching(fb, "koopa") || player.isssTouching(fb, "Hammerbro")) {
+      world.remove(fb);
+      fireballs.remove(i);
+    }
+    if (times100 <=0) {
       world.remove(fb);
       fireballs.remove(i);
     }
@@ -458,14 +507,15 @@ void shootfireball() {
   fb.setName("fireball");
   fb.setRotatable(true);
   fb.setStatic(false);
-  fb.setSensor(true);
+  fb.setSensor(false);
   fb.setDensity(1);
   fb.setFriction(0.2);
-  fb.setAngularVelocity(20);
+  fb.setAngularVelocity(random(0, 40));
   fb.attachImage(fireball);
   fb.setRestitution(0.9);
+  int dir = 1;
+  if (player.getVelocityX() < 0) dir = -1;
 
-  int dir = (player.direction);
   fb.setVelocity(500 * dir, -50);
 
   world.add(fb);

@@ -17,10 +17,11 @@ class FPlayer extends FGameObject {
   int timer2 = 0;
 
   FPlayer() {
-    super(gridSize, gridSize);
+    super(gridSize-1, gridSize);
     frame = 0;
     lives = 3;
-    setPosition(96, 100);
+    direction = R;
+    setPosition(respawnX, respawnY);
     setName("player");
     setRotatable(false);
     attachImage(idle[0]);
@@ -60,7 +61,8 @@ class FPlayer extends FGameObject {
   void act() {
     if (starpower && spacekey && starcd == 0) {
       shootfireball();
-      starcd = 15;
+      starcd = 300;
+      times100 = 290;
     }
     if (touched) {
       lives--;
@@ -68,6 +70,8 @@ class FPlayer extends FGameObject {
     }
     if (portalCooldown > 0) portalCooldown--;
     if (lavaCooldown > 0) lavaCooldown--;
+    if (starcd > 0) starcd--;
+    if (times100 > 0) times100--;
     input();
     animate();
     footSensor.setPosition(player.getX(), player.getY()+12);
@@ -94,11 +98,19 @@ class FPlayer extends FGameObject {
 
     if (lives <= 0) {
       mode = 4;
+      respawnX = 496;
+      respawnY = 100;
+      gameovers.rewind();
+      gameovers.play();
+
+      themes.pause();
       lives = 3;
     }
 
     if (timer2 == 1) {
-      setPosition(96, 100);
+      setPosition(respawnX, respawnY);
+      kills.rewind();
+      kills.play();
     }
     if (timer2 > 0) {
       timer--;
@@ -144,6 +156,8 @@ class FPlayer extends FGameObject {
       setVelocity(vx, -400);
       jumps = jumps + 1;
       touchground = false;
+      jumpss.rewind();
+      jumpss.play();
     }
     if (abs(vy) > 0.1 && canmove)
       action = jump;
@@ -157,7 +171,9 @@ class FPlayer extends FGameObject {
     if (issTouching(footSensor, "spikes")) {
       lives--;
       setVelocity(0, 0);
-      setPosition(96, 100);
+      setPosition(respawnX, respawnY);
+      kills.rewind();
+      kills.play();
       player.canmove = false;
       player.timer = 100;
     }
@@ -207,6 +223,26 @@ class FPlayer extends FGameObject {
       lives++;
       world.remove(hdrop);
       hdrop = null;
+    }
+    if (isTouching("hammer")) {
+      player.lives--;
+      player.setVelocity(0, 0);
+      player.setPosition(respawnX, respawnY);
+      kills.rewind();
+      kills.play();
+      player.canmove = false;
+      player.timer = 100;
+    }
+    if (isTouching("checkpoint")) {
+      checkmark.rewind();
+      checkmark.play();
+      respawnX = getX();
+      respawnY = getY();
+    }
+    if (isTouching("finishs")) {
+      mode = GAMEWIN;
+      wins.rewind();
+      wins.play();
     }
   }
 }

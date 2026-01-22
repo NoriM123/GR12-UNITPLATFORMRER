@@ -1,106 +1,91 @@
 class FThwomp extends FGameObject {
-  boolean Sense = false;
-  FBox thwompSensor;
 
+  int mode = 0;
+  float sensor = gridSize;
   float startY;
-  boolean falling = false;
-  boolean rising = false;
+  float riseSpeed = -1.5;
+
+  FBox thwompSensor;
 
   FThwomp(float x, float y) {
     super(gridSize*2, gridSize*2);
+    startY = y;
     setPosition(x, y);
-    setRestitution(0);
+    setName("thwomp");
     setRotatable(false);
     setStatic(true);
-    setDensity(10000);
-    setName("thwomp");
     attachImage(thwomp[0]);
-    startY = y;
 
-    thwompSensor = new FBox(gridSize*2, 32*7);
+    thwompSensor = new FBox(gridSize*2, 225);
     thwompSensor.setStaticBody(true);
     thwompSensor.setSensor(true);
-    thwompSensor.setNoStroke();
     thwompSensor.setFill(255, 0);
+    thwompSensor.setNoStroke();
     thwompSensor.setName("thwompSensor");
     world.add(thwompSensor);
   }
 
   void act() {
-    thwompSensor.setPosition(getX(), getY() + 96);
+
+    thwompSensor.setPosition(getX(), getY() + 112);
+    if (mode == 1) attachImage(thwomp[1]);
+    else attachImage(thwomp[0]);
+    checkPlayer();
+    fall();
+    rise();
+    hitPlayer();
+  }
+
+
+  void checkPlayer() {
+    if (mode != 0) return;
+
+    boolean under = false;
 
     if (issTouching(thwompSensor, "player")) {
-      Sense = true;
+      under = true;
     }
-    if (Sense) {
-      attachImage(thwomp[1]);
-    } else {
-      attachImage(thwomp[0]);
-    }
-    moveThwomp1();
-  }
 
-  void moveThwomp1() {
-    if (Sense && !falling && !rising) {
-      falling = true;
+    if (under) {
+      thwomps.rewind();
+      thwomps.play();
+      mode = 1;
       setStatic(false);
-      setVelocity(0, 100);
-    }
-    if (isTouching("stonebricks")) {
-      setVelocity(0, 0);
-      falling = false;
-      rising = true;
-      Sense = false;
-    }
-    if (rising) {
-      setVelocity(0, -100);
-      if (getY() <= startY) {
-        setPosition(getX(), startY);
-        setVelocity(0, 0);
-        setStatic(true);
-        rising = false;
-      }
-    }
-    if (isTouching("player")) {
-      player.setPosition(96, 100);
-      player.setVelocity(0, 0);
-      player.canmove = false;
-      player.timer = 100;
-      touched = true;
     }
   }
 
-  void moveThwomp() {
-    if (Sense && !falling && !rising) {
-      falling = true;
-      setStatic(false);
-      setVelocity(0, 100);
+  void fall() {
+    if (mode != 1) return;
+
+    if (touchingGround()) {
+      mode = 2;
+      setStatic(true);
+    }
+  }
+
+  void rise() {
+    if (mode != 2) return;
+
+    float newY = getY() + riseSpeed;
+
+    if (newY <= startY) {
+      newY = startY;
+      mode = 0;
     }
 
-    if (falling && isTouching("stonebricks") || isTouching("player")) {
-      setVelocity(0, 0);
-      falling = false;
-      rising = true;
-    }
+    setPosition(getX(), newY);
+  }
 
+  boolean touchingGround() {
+    return isTouching("stonebricks");
+  }
+
+  void hitPlayer() {
     if (isTouching("player")) {
-      player.setPosition(96, 100);
-      player.setVelocity(0, 0);
-      player.canmove = false;
-      player.timer = 100;
-      touched = true;
-    }
-
-    if (rising) {
-      setVelocity(0, -100);
-      if (getY() <= startY) {
-        setPosition(getX(), startY);
-        setVelocity(0, 0);
-        setStatic(true);
-        rising = false;
-        falling = false;
-        Sense = false;
-      }
+      player.lives--;
+      player.setPosition(respawnX, respawnY);
+      kills.rewind();
+      kills.play();
     }
   }
 }

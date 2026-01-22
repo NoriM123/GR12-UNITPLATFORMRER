@@ -1,4 +1,6 @@
 void gamewin() {
+  themes.pause();
+
   fill(intro);
   noStroke();
   rect(width/2-5, height/2+5, 400, 100);
@@ -10,15 +12,25 @@ void gamewin() {
 
   fill(intro);
   textSize(40);
-  text("Play Again", width/2, height/2+16);
+  text("WON", width/2, height/2+16);
   fill(255);
   textSize(42);
-  text("Play Again", width/2, height/2+13);
+  text("WON", width/2, height/2+13);
 }
 
 void gamewinClicks() {
   if (mouseX> width/2 - 200 && mouseX<width/2+200 && mouseY>height/2 - 50 && mouseY<height/2 +50) {
     setup();
     mode = 0;
+    drops = false;
+    drop = null;
+    koopadrops = false;
+    kdrop = null;
+    hasShell = false;
+    hasStar = false;
+    hdrop = null;
+    heartdrops = false;
+        respawnX = 496;
+    respawnY = 100;
   }
 }

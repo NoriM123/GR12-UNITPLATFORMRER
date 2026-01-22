@@ -8,6 +8,8 @@ void game() {
   checkhDropRemove();
   images();
 
+
+
   drawLives(player.lives);
 }
 
@@ -30,13 +32,23 @@ void pausebutton() {
 }
 
 void images() {
-   if (mode == 1) {
+  if (mode == 1) {
     pausebutton();
   }
   if (hasStar) {
     image(star, width - 50, 20, 32, 32);
+    strokeWeight(2);
+
+    float bar = map(starcd, 300, 0, 0, 100);
+    stroke(0);
+    fill(255);
+    rect(width - 115, 37, 100, 20);
+    fill(intro);
+    rectMode(CORNER);
+    rect(width - 165, 27, bar, 20);
+    rectMode(CENTER);
   }
   if (hasShell) {
     image(shell, width - 100, 20, 32, 32);
-  } 
+  }
 }

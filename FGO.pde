@@ -36,4 +36,12 @@ class FGameObject extends FBox {
     }
     return false;
   }
+
+  boolean isssTouching(FCircle c, String name) {
+    ArrayList<FContact> contacts = c.getContacts();
+    for (int i = 0; i < contacts.size(); i++) {
+      if (contacts.get(i).contains(name)) return true;
+    }
+    return false;
+  }
 }

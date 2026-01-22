@@ -9,7 +9,7 @@ void introClicks() {
 }
 
 void introart() {
-   textAlign(CENTER);
+  textAlign(CENTER);
   rectMode(CENTER);
   image(myGif, 0, 0, width, height);
 
@@ -36,5 +36,5 @@ void introart() {
   //  text("Click to start", width/2, height/2+35);
 
   //  fill(green);
-  //  rect(width/2, height-50, 800, 100); 
+  //  rect(width/2, height-50, 800, 100);
 }

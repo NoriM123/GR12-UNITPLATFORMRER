@@ -1,4 +1,5 @@
 void gameover() {
+
   gameoverart();
 }
 
@@ -13,6 +14,8 @@ void gameoverClicks() {
     hasStar = false;
     hdrop = null;
     heartdrops = false;
+            respawnX = 496;
+    respawnY = 100;
     mode = 0;
   }
 }

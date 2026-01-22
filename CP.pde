@@ -1,12 +1,15 @@
 void pause() {
   pausecontinuebutton();
   pausepanel();
+  themes.pause();
 
   drawLives(player.lives);
 }
 
 void pauseClicks() {
   if (mouseX>width/2 && mouseX<width/2+200 && mouseY>height/2-50 && mouseY<height/2+50) {
+    themes.rewind();
+    themes.play();
     mode = 1;
   }
   if (mouseX>width/2-200 && mouseX<width/2 && mouseY>height/2-50 && mouseY<height/2+50) {
@@ -15,11 +18,13 @@ void pauseClicks() {
     drop = null;
     koopadrops = false;
     kdrop = null;
-    hasShell = false; 
+    hasShell = false;
     hasStar = false;
     hdrop = null;
     heartdrops = false;
-    
+    respawnX = 496;
+    respawnY = 100;
+
     mode = 0;
   }
 }
