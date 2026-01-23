@@ -13,6 +13,11 @@ class FHammer extends FGameObject {
     attachImage(hammerb[0]);
   }
   void act() {
+    if (isTouching("shell")) {
+      world.remove(this);
+      enemies.remove(this);
+    }
+
     if (isTouching("fireball")) {
       world.remove(this);
       enemies.remove(this);

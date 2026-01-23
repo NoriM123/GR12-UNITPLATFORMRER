@@ -57,7 +57,7 @@ class FThwomp extends FGameObject {
   void fall() {
     if (mode != 1) return;
 
-    if (touchingGround()) {
+    if (isTouching("stonebricks")) {
       mode = 2;
       setStatic(true);
     }
@@ -76,9 +76,6 @@ class FThwomp extends FGameObject {
     setPosition(getX(), newY);
   }
 
-  boolean touchingGround() {
-    return isTouching("stonebricks");
-  }
 
   void hitPlayer() {
     if (isTouching("player")) {

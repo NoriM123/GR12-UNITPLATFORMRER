@@ -11,6 +11,11 @@ class FGoomba extends FGameObject {
     attachImage(goomba[0]);
   }
   void act() {
+    if (isTouching("shell")) {
+      world.remove(this);
+      enemies.remove(this);
+    }
+
     animate();
     collide();
     move();

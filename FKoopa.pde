@@ -1,15 +1,17 @@
 class FKoopa extends FGameObject {
 
-  int direction = L;
-  float walkSpeed  = 50;
-  float shellSpeed = 300;
+  int dir = L;
 
-  int state;
-  final int WALK = 0;
-  final int SHELLSTILL = 1;
-  final int SHELLMOVING = 2;
+  float walkSpd = 50;
+  float shellSpd = 300;
 
+  int mode;
+  final int walking = 0;
+  final int shellstop = 1;
+  final int shellgo = 2;
   int frame = 0;
+
+  int hitCD = 0;
 
   FKoopa(float x, float y) {
     super(gridSize, gridSize);
@@ -18,94 +20,101 @@ class FKoopa extends FGameObject {
     setRotatable(false);
     setFriction(0);
     setRestitution(0);
-    state = WALK;
-  }
 
+    mode = walking;
+  }
 
   void act() {
+    if (hitCD > 0) hitCD--;
+
     if (isTouching("fireball")) {
-      world.remove(this);
-      enemies.remove(this);
+      if (mode == walking) {
+        mode = shellstop;               
+        setVelocity(0, getVelocityY());   
+        hitCD = 10;                        
+      } else {
+
+        world.remove(this);
+        enemies.remove(this);
+        return;
+      }
     }
-    animate();
-    collide();
-    move();
+
+    hitWalls();
+    hitPlayer();
+    moveKoopa();
+    drawKoopa();
   }
 
-  void animate() {
-    if (state != WALK) {
+  void drawKoopa() {
+    if (mode != walking) {
       attachImage(shell);
       return;
     }
 
     if (frame >= koopa.length) frame = 0;
+
     if (frameCount % 5 == 0) {
-      if (direction == R) attachImage(koopa[frame]);
-      if (direction == L) attachImage(reversingImage(koopa[frame]));
+      if (dir == R) attachImage(koopa[frame]);
+      if (dir == L) attachImage(reversingImage(koopa[frame]));
       frame++;
     }
   }
 
-  void move() {
+  void moveKoopa() {
     float vy = getVelocityY();
 
-    if (state == WALK) {
-      setVelocity(walkSpeed * direction, vy);
-    } else if (state == SHELLMOVING) {
-      setVelocity(shellSpeed * direction, vy);
+    if (mode == walking) {
+      setVelocity(walkSpd * dir, vy);
+    } else if (mode == shellgo) {
+      setVelocity(shellSpd * dir, vy);  
     } else {
-      setVelocity(0, vy);
+      setVelocity(0, vy); 
     }
   }
 
-  void collide() {
-    if (isTouching("wall")) {
-      if (state != SHELLSTILL) {
-        direction *= -1;
-        setPosition(getX() + direction * 2, getY());
-      }
-    }
+  void hitWalls() {
+    if (!isTouching("wall")) return;
 
+    if (mode == walking || mode == shellgo) {
+      dir *= -1;
+      setPosition(getX() + dir * 2, getY());
+    }
+  }
+
+  void hitPlayer() {
+    if (!isTouching("player")) return;
+
+    if (hitCD > 0) return;
 
     boolean stomp = false;
-    
-        if (!isTouching("player")) stomp = false;
-
-    if (state == WALK && isTouching("fireball")) {
-      state = SHELLSTILL;
+    if (issTouching(player.footSensor, "koopa")){
+     stomp = true; 
     }
-
-    if (issTouching(player.footSensor, "koopa") || isTouching("fireball")) {
-      stomp = true;
-    }
-
 
     if (stomp) {
-      if (state == WALK) {
-        state = SHELLSTILL;
+      hitCD = 10; 
+
+      if (mode == walking) {
+        mode = shellgo;                         
+        dir = L;
         player.setVelocity(player.getVelocityX(), -300);
       }
-
-      if (state == SHELLMOVING) {
-        state = SHELLSTILL;
+      if (mode == shellgo) {
+        mode = shellstop;
         player.setVelocity(player.getVelocityX(), -300);
       }
-
-      if (state == SHELLSTILL) {
-        world.remove(this);
-        enemies.remove(this);
+      if (mode == shellstop) {
+        mode = shellgo;
+        dir = L;
         player.setVelocity(player.getVelocityX(), -300);
       }
     }
 
-    if (state == WALK) {
+    if (mode == walking || mode == shellgo) {
+      hitCD = 20; 
       player.lives--;
       player.setPosition(respawnX, respawnY);
-    }
-
-    if (state == SHELLSTILL) {
-      state = SHELLMOVING;
-      direction = (player.getX() < getX()) ? R : L;
     }
   }
 }
